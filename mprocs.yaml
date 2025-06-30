@@ -2,12 +2,13 @@ procs:
   mobile:
     shell: cd mobile && npm start
   backend:
-    shell: cd backend && npm run dev
+    shell: bin/backend
   localtunnel:
-    shell: npx localtunnel --subdomain ostrich-talks --port 5000
+    shell: npx localtunnel --subdomain ostrich-talks --port 3000
   docker-compose:
-    shell: docker-compose up
+    shell: |
+      docker-compose up -d && echo "✅ Docker containers started!"
   mongodb-shell:
-    shell: docker exec -it ostrich-talks-mongo mongosh -u ostrich -p ostrich123 --authenticationDatabase admin
+    shell: bin/mongosh
   mongo-express:
-    shell: open http://localhost:8081 
+    shell: bin/mongo-express-sh 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd backend
+cmd="npm run dev"
+
+echo "▶️ Starting backend without restart loop..."
+trap 'kill -TERM $child 2>/dev/null; while kill -0 $child 2>/dev/null; do sleep 1; done' EXIT
+$cmd &
+child=$!
+wait $child

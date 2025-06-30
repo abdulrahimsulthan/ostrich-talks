@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CONTAINER=ostrich-talks-mongo-express
+
+# Wait for the container to be running
+while ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER$"; do
+  echo "⏳ Waiting for Mongo Express container ($CONTAINER) to be running..."
+  sleep 1
+done
+
+echo "✅ Mongo Express container ($CONTAINER) is running!"
+open http://localhost:8082
+docker logs -f $CONTAINER 

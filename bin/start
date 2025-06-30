@@ -18,4 +18,4 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Start all services
-mprocs mprocs.yaml 
+mprocs --config mprocs.yaml 

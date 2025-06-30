@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CONTAINER=ostrich-talks-mongo
+
+# Wait for the container to be running
+while ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER$"; do
+  echo "⏳ Waiting for MongoDB container ($CONTAINER) to be running..."
+  sleep 1
+done
+
+echo "✅ MongoDB container ($CONTAINER) is running!"
+docker exec -it $CONTAINER mongosh -u ostrich -p ostrich123 --authenticationDatabase admin 

@@ -27,17 +27,9 @@ fi
 
 echo "✅ npm version: $(npm -v)"
 
-# Install root dependencies
-echo "📦 Installing root dependencies..."
+# Install all dependencies using workspaces
+echo "📦 Installing all dependencies (monorepo workspaces)..."
 npm install
-
-# Install backend dependencies
-echo "🔧 Installing backend dependencies..."
-npm run install:backend
-
-# Install mobile dependencies
-echo "📱 Installing mobile dependencies..."
-npm run install:mobile
 
 # Create environment files
 echo "⚙️ Setting up environment files..."
@@ -60,17 +52,6 @@ else
     echo "✅ Mobile environment file already exists"
 fi
 
-# Check if MongoDB is running (optional)
-echo "🗄️ Checking MongoDB connection..."
-if command -v mongosh &> /dev/null; then
-    if mongosh --eval "db.runCommand('ping')" > /dev/null 2>&1; then
-        echo "✅ MongoDB is running"
-    else
-        echo "⚠️  MongoDB is not running. Please start MongoDB for backend development."
-    fi
-else
-    echo "⚠️  MongoDB client not found. Please install MongoDB for backend development."
-fi
 
 # Check if Expo CLI is installed
 if ! command -v expo &> /dev/null; then
@@ -84,12 +65,13 @@ echo ""
 echo "🎉 Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Edit backend/.env with your MongoDB and JWT configuration"
-echo "2. Edit mobile/.env with your Firebase and API configuration"
-echo "3. Start development servers:"
-echo "   - npm run dev (both backend and mobile)"
-echo "   - npm run dev:backend (backend only)"
-echo "   - npm run dev:mobile (mobile only)"
+echo "1. Edit backend/.env with your MongoDB and Firebase configuration."
+echo "2. Edit mobile/.env with your Firebase and API configuration."
+echo "3. Start all development services with:"
+echo "   ./bin/start"
+echo "   (or: mprocs mprocs.yaml)"
+echo ""
+echo "You can also start individual services with npm scripts if needed."
 echo ""
 echo "📚 Documentation:"
 echo "- Backend API: backend/README.md"
