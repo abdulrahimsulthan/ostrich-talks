@@ -1,0 +1,47 @@
+{
+  "name": "ostrich-talks",
+  "version": "1.0.0",
+  "description": "Ostrich Talks - Language Learning Platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:mobile\"",
+    "dev:backend": "npm run dev --workspace=ostrich-talks-api",
+    "dev:mobile": "npm run start --workspace=ostrich-talks-mobile",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build --workspace=ostrich-talks-api",
+    "build:mobile": "npm run build --workspace=ostrich-talks-mobile",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules",
+    "install:all": "npm install && npm run install:backend && npm run install:mobile",
+    "install:backend": "npm install --workspace=ostrich-talks-api",
+    "install:mobile": "npm install --workspace=ostrich-talks-mobile"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ostrich-talks.git"
+  },
+  "keywords": [
+    "language-learning",
+    "mobile-app",
+    "react-native",
+    "nodejs",
+    "express",
+    "mongodb",
+    "gamification"
+  ],
+  "author": "Ostrich Talks Team",
+  "license": "MIT"
+} 

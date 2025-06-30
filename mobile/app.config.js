@@ -1,0 +1,52 @@
+export default {
+    expo: {
+        name: "ostrich-talks",
+        slug: "ostrich-talks",
+        version: "1.0.0",
+        orientation: "portrait",
+        icon: "./assets/images/icon.png",
+        scheme: "myapp",
+        userInterfaceStyle: "automatic",
+        newArchEnabled: true,
+        ios: {
+            supportsTablet: true,
+            bundleIdentifier: "com.abdulrahimsulthan.ostrichtalks"
+        },
+        android: {
+            adaptiveIcon: {
+                foregroundImage: "./assets/images/adaptive-icon.png",
+                backgroundColor: "#ffffff"
+            },
+            package: "com.abdulrahimsulthan.ostrichtalks",
+            googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+        },
+        web: {
+            bundler: "metro",
+            output: "static",
+            favicon: "./assets/images/favicon.png"
+        },
+        plugins: [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    image: "./assets/images/splash-icon.png",
+                    imageWidth: 200,
+                    resizeMode: "contain",
+                    backgroundColor: "#ffffff"
+                }
+            ]
+        ],
+        experiments: {
+            typedRoutes: true
+        },
+        extra: {
+            router: {
+                origin: false
+            },
+            eas: {
+                projectId: "2418045f-f324-4098-91ae-0da1a5f458b5"
+            }
+        }
+    }
+}
