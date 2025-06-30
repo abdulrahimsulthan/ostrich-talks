@@ -1,0 +1,13 @@
+procs:
+  mobile:
+    shell: cd mobile && npm start
+  backend:
+    shell: cd backend && npm run dev
+  localtunnel:
+    shell: npx localtunnel --subdomain ostrich-talks --port 5000
+  docker-compose:
+    shell: docker-compose up
+  mongodb-shell:
+    shell: docker exec -it ostrich-talks-mongo mongosh -u ostrich -p ostrich123 --authenticationDatabase admin
+  mongo-express:
+    shell: open http://localhost:8081 

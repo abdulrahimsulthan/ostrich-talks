@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Start all Ostrich Talks services using mprocs
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PROJECT_ROOT=$(dirname "$SCRIPT_DIR")
+
+cd "$PROJECT_ROOT"
+
+if ! command -v mprocs &> /dev/null; then
+  echo "❌ mprocs is not installed. Please install it: https://github.com/pvolok/mprocs"
+  exit 1
+fi
+
+if ! command -v docker &> /dev/null; then
+  echo "❌ Docker is not installed. Please install Docker."
+  exit 1
+fi
+
+# Start all services
+mprocs mprocs.yaml 
