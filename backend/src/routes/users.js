@@ -328,4 +328,31 @@ router.delete('/account', authMiddleware, asyncHandler(async (req, res) => {
   });
 }));
 
+// @route   PUT /api/users/fcm-token
+// @desc    Update user's FCM token
+// @access  Private
+router.put('/fcm-token', [
+  body('fcmToken')
+    .notEmpty()
+    .withMessage('FCM token is required')
+], authMiddleware, asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new AppError(errors.array()[0].msg, 400);
+  }
+
+  const { fcmToken } = req.body;
+  
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { fcmToken },
+    { new: true, runValidators: true }
+  );
+
+  res.json({
+    success: true,
+    message: 'FCM token updated successfully'
+  });
+}));
+
 module.exports = router; 

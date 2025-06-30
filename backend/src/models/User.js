@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true
   },
+  fcmToken: {
+    type: String,
+    sparse: true
+  },
   
   // Social connections
   followers: [{
