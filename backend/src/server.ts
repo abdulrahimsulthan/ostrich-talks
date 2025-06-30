@@ -1,23 +1,26 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+import express, { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const lessonRoutes = require('./routes/lessons');
-const progressRoutes = require('./routes/progress');
-const leagueRoutes = require('./routes/leagues');
-const questRoutes = require('./routes/quests');
+import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
+import lessonRoutes from './routes/lessons';
+import progressRoutes from './routes/progress';
+import leagueRoutes from './routes/leagues';
+import questRoutes from './routes/quests';
 
 // Import middleware
-const { errorHandler } = require('./middleware/errorHandler');
-const { authMiddleware } = require('./middleware/auth');
+import { errorHandler } from './middleware/errorHandler';
+import { authMiddleware } from './middleware/auth';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,8 +39,8 @@ app.use(cors({
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
   message: {
     error: 'Too many requests from this IP, please try again later.'
   }
@@ -56,7 +59,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'OK',
     message: 'Ostrich Talks API is running',
@@ -74,7 +77,7 @@ app.use('/api/leagues', authMiddleware, leagueRoutes);
 app.use('/api/quests', authMiddleware, questRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (req: Request, res: Response) => {
   res.status(404).json({
     error: 'Route not found',
     message: `Cannot ${req.method} ${req.originalUrl}`
@@ -85,26 +88,31 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // Database connection
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   try {
     const mongoURI = process.env.NODE_ENV === 'production' 
       ? process.env.MONGODB_URI_PROD 
       : process.env.MONGODB_URI;
     
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    if (!mongoURI) {
+      throw new Error('MongoDB URI is not defined in environment variables');
+    }
+
+    await mongoose.connect(mongoURI);
     
     console.log('✅ MongoDB connected successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
+    if (error instanceof Error) {
+      console.error('❌ MongoDB connection error:', error.message);
+    } else {
+      console.error('❌ MongoDB connection error:', error);
+    }
     process.exit(1);
   }
 };
 
 // Start server
-const startServer = async () => {
+const startServer = async (): Promise<void> => {
   await connectDB();
   
   app.listen(PORT, () => {
@@ -115,7 +123,7 @@ const startServer = async () => {
 };
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on('unhandledRejection', (err: Error) => {
   console.log(`Error: ${err.message}`);
   // Close server & exit process
   process.exit(1);
@@ -123,4 +131,4 @@ process.on('unhandledRejection', (err, promise) => {
 
 startServer();
 
-module.exports = app; 
+export default app; 

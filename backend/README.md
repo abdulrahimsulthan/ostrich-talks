@@ -1,6 +1,6 @@
-# Ostrich Talks Backend API
+# Ostrich Talks API
 
-A comprehensive Node.js/Express/MongoDB backend for the Ostrich Talks mobile learning application.
+Backend API for the Ostrich Talks mobile app, built with Node.js, Express, TypeScript, and MongoDB.
 
 ## 🚀 Features
 
@@ -16,9 +16,9 @@ A comprehensive Node.js/Express/MongoDB backend for the Ostrich Talks mobile lea
 
 ## 📋 Prerequisites
 
-- Node.js (v18 or higher)
-- MongoDB (local or cloud)
-- npm or yarn
+- Node.js >= 18.0.0
+- MongoDB
+- TypeScript >= 5.3.0
 
 ## 🛠️ Installation
 
@@ -44,12 +44,18 @@ A comprehensive Node.js/Express/MongoDB backend for the Ostrich Talks mobile lea
    MONGODB_URI=mongodb://localhost:27017/ostrich-talks
    JWT_SECRET=your-super-secret-jwt-key
    JWT_EXPIRES_IN=7d
+   MONGODB_URI_PROD=mongodb://production-uri
+   RATE_LIMIT_WINDOW_MS=900000
+   RATE_LIMIT_MAX_REQUESTS=100
    ```
 
 4. **Start the server**
    ```bash
    # Development
    npm run dev
+   
+   # Build
+   npm run build
    
    # Production
    npm start
@@ -370,6 +376,75 @@ The backend is designed to work seamlessly with the Ostrich Talks mobile app:
 3. Make your changes
 4. Add tests
 5. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the API documentation
+
+---
+
+**Ostrich Talks Backend** - Empowering language learning through gamification and social features.
+
+## Project Structure
+
+```
+src/
+├── middleware/     # Express middleware
+├── models/        # Mongoose models
+├── routes/        # Express routes
+├── types/         # TypeScript type definitions
+├── server.ts      # Express app setup
+└── config/        # Configuration files
+```
+
+## Scripts
+
+- `npm run dev` - Start development server with hot-reload
+- `npm run build` - Build TypeScript files
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint errors
+- `npm run typecheck` - Run TypeScript type checking
+- `npm run clean` - Clean build files and dependencies
+
+## API Documentation
+
+### Authentication
+
+All API routes except `/api/auth/*` and `/health` require authentication. Include the JWT token in the Authorization header:
+
+```
+Authorization: Bearer <token>
+```
+
+### Available Routes
+
+- `GET /health` - Health check endpoint
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/users/me` - Get current user
+- `GET /api/lessons` - Get all lessons
+- `GET /api/progress` - Get user progress
+- `GET /api/leagues` - Get leagues
+- `GET /api/quests` - Get quests
+
+For detailed API documentation, refer to the API documentation file.
+
+## Error Handling
+
+The API uses a centralized error handling middleware that processes different types of errors:
+
+- Validation errors (400)
+- Authentication errors (401)
+- Not found errors (404)
+- Server errors (500)
 
 ## 📄 License
 
