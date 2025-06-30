@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import storage from '@/store/storage';
 
 class ApiService {
   private api: AxiosInstance;
@@ -25,14 +25,14 @@ class ApiService {
   private setupInterceptors() {
     // Request interceptor
     this.api.interceptors.request.use(
-      async (config) => {
+      (config) => {
         try {
-          const token = await AsyncStorage.getItem('auth_token');
+          const token = storage.getString('firebase_id_token');
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
         } catch (error) {
-          console.warn('Failed to get auth token:', error);
+          console.warn('Failed to get Firebase ID token from MMKV:', error);
         }
         return config;
       },
@@ -44,7 +44,6 @@ class ApiService {
       (response: AxiosResponse) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          // Handle token refresh or logout
           await this.handleUnauthorized();
         }
         return Promise.reject(error);
@@ -54,8 +53,8 @@ class ApiService {
 
   private async handleUnauthorized() {
     try {
-      await AsyncStorage.removeItem('auth_token');
-      // Navigate to login screen - this would be handled by your navigation
+      storage.delete('firebase_id_token');
+      // Optionally, trigger navigation to login screen
       console.log('User unauthorized, redirecting to login');
     } catch (error) {
       console.error('Failed to handle unauthorized:', error);
@@ -101,35 +100,32 @@ class ApiService {
 
   private handleError(error: any) {
     if (error.response) {
-      // Server responded with error status
       const message = error.response.data?.message || 
                      error.response.data?.error || 
                      `HTTP ${error.response.status}`;
       return new Error(message);
     } else if (error.request) {
-      // Network error
       return new Error('Network error. Please check your connection.');
     } else {
-      // Other error
       return new Error(error.message || 'An unexpected error occurred');
     }
   }
 
-  // Helper method to set auth token
-  async setAuthToken(token: string) {
+  // Helper method to set Firebase ID token
+  setFirebaseIdToken(token: string) {
     try {
-      await AsyncStorage.setItem('auth_token', token);
+      storage.set('firebase_id_token', token);
     } catch (error) {
-      console.error('Failed to save auth token:', error);
+      console.error('Failed to save Firebase ID token:', error);
     }
   }
 
-  // Helper method to clear auth token
-  async clearAuthToken() {
+  // Helper method to clear Firebase ID token
+  clearFirebaseIdToken() {
     try {
-      await AsyncStorage.removeItem('auth_token');
+      storage.delete('firebase_id_token');
     } catch (error) {
-      console.error('Failed to clear auth token:', error);
+      console.error('Failed to clear Firebase ID token:', error);
     }
   }
 }

@@ -1,32 +1,81 @@
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import storage from "./storage";
-import fetchUser from "@/services/fetchUser";
+import api from "@/lib/api";
+import { User } from "@/types/interfaces";
+import { getAuth, signInWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
 
-export interface userState {
-  id: string;
-  name: string;
-  profileUri: String;
-  joined: number;
-  followers: number;
-  following: number;
-  loading: boolean;
-  setId: (id: string) => void
-  fetchUser: () => Promise<void>;
+interface UserStoreState {
+  user: User | null;
+  idToken: string | null;
+  isLoading: boolean;
+  error: string | null;
+  // Actions
+  setUser: (user: User | null) => void;
+  setIdToken: (token: string | null) => void;
+  fetchUserProfile: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  clearError: () => void;
 }
 
-const userStore = create<userState>()(
+const userStore = create<UserStoreState>()(
+  devtools(
     persist(
-      (set) => ({
-        id: "",
-        name: "John Doe",
-        joined: Date.now(),
-        profileUri: "",
-        followers: 0,
-        following: 0,
-        loading: false,
-        setId: (id) => set({id}),
-        fetchUser: fetchUser(set),
+      (set, get) => ({
+        user: null,
+        idToken: storage.getString('firebase_id_token') || null,
+        isLoading: false,
+        error: null,
+
+        setUser: (user) => set({ user }),
+        setIdToken: (token) => {
+          if (token) {
+            storage.set('firebase_id_token', token);
+          } else {
+            storage.delete('firebase_id_token');
+          }
+          set({ idToken: token });
+        },
+
+        fetchUserProfile: async () => {
+          set({ isLoading: true, error: null });
+          try {
+            // Backend expects Firebase ID token in Authorization header
+            const user = await api.get('/users/profile');
+            set({ user, isLoading: false });
+          } catch (error: any) {
+            set({ error: error.message || 'Failed to fetch user profile', isLoading: false });
+          }
+        },
+
+        loginWithEmail: async (email, password) => {
+          set({ isLoading: true, error: null });
+          try {
+            const credential = await signInWithEmailAndPassword(getAuth(), email, password);
+            const idToken = await credential.user.getIdToken();
+            get().setIdToken(idToken);
+            await get().fetchUserProfile();
+            set({ isLoading: false });
+          } catch (error: any) {
+            set({ error: error.message || 'Login failed', isLoading: false });
+            throw error;
+          }
+        },
+
+        logout: async () => {
+          set({ isLoading: true });
+          try {
+            await signOut(getAuth());
+          } catch (error) {
+            // Ignore
+          } finally {
+            get().setIdToken(null);
+            set({ user: null, isLoading: false, error: null });
+          }
+        },
+
+        clearError: () => set({ error: null }),
       }),
       {
         name: "user-store",
@@ -35,8 +84,10 @@ const userStore = create<userState>()(
           setItem: (key, value) => storage.set(key, value),
           removeItem: (key) => storage.delete(key),
         })),
+        partialize: (state) => ({ user: state.user, idToken: state.idToken }),
       }
     )
+  )
 );
 
 export default userStore;
