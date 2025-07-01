@@ -49,6 +49,11 @@ export default function HomeLayout() {
                 presentation: "fullScreenModal",
                 title: "Alter Egos",
             }} />
+            <Stack.Screen name="startLevel" options={{
+                presentation: "fullScreenModal",
+                title: "Start Level",
+                headerShown: false,
+            }} />
         </Stack>
     )
 };

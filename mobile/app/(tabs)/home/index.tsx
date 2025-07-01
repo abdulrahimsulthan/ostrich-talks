@@ -5,6 +5,7 @@ import userStore from "@/store/userStore";
 import overviewStore from "@/store/overviewStore";
 import { completedMessage, streakLevels } from "@/constants/streak";
 import HomeMenus from "@/components/Home/HomeMenus";
+import { router } from "expo-router";
 
 export default function Index() {
   const { name } = userStore();
@@ -57,23 +58,18 @@ export default function Index() {
               This is where you can find your lessons.
             </Text>
             <Text className="text-textSecondary">
-              Click on the buttons below to mock levels.
+              Click on the button below to start practicing.
             </Text>
 
             <View className="w-full flex-row justify-around items-center mt-4">
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/home/startLevel')}>
                 <Text
                   className={`
                 text-white bg-primary border 
                 border-border rounded-md px-4 py-2 
                 `}
                 >
-                  Start Lession
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Text className="text-white bg-primary rounded-md px-4 py-2">
-                  End Lession
+                  Start Level
                 </Text>
               </TouchableOpacity>
             </View>

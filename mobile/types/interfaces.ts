@@ -94,3 +94,42 @@ export interface League {
   rank: number;
   totalPlayers: number;
 }
+
+export interface UserStoreState {
+  name: string;
+  email: string;
+  uid: string;
+  photoURL: string | null;
+  setUser: (user: { name: string; email: string; uid: string; photoURL: string | null }) => void;
+  clearUser: () => void;
+}
+
+export interface ProgressStoreState {
+  level: number;
+  completed: number;
+  home: number;
+  social: number;
+  office: number;
+  leadership: number;
+  title: string;
+  setProgress: (progress: { level: number; completed: number; home: number; social: number; office: number; leadership: number; title: string }) => void;
+  clearProgress: () => void;
+}
+
+export interface OverviewStoreState {
+  streak: number;
+  streakGoal: number;
+  streakLevel: number;
+  feathers: number;
+  willPower: number;
+  setOverview: (overview: { streak: number; streakGoal: number; streakLevel: number; feathers: number; willPower: number }) => void;
+  clearOverview: () => void;
+}
+
+export interface LeagueStoreState {
+  rank: number;
+  points: number;
+  league: string;
+  setLeague: (league: { rank: number; points: number; league: string }) => void;
+  clearLeague: () => void;
+}

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import storage from "./storage";
 import api from "@/lib/api";
-import { User } from "@/types/interfaces";
+import { User, UserStoreState } from "@/types/interfaces";
 import { getAuth, signInWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
 
 interface UserStoreState {
@@ -10,6 +10,10 @@ interface UserStoreState {
   idToken: string | null;
   isLoading: boolean;
   error: string | null;
+  name: string;
+  email: string;
+  uid: string;
+  photoURL: string | null;
   // Actions
   setUser: (user: User | null) => void;
   setIdToken: (token: string | null) => void;
@@ -17,6 +21,7 @@ interface UserStoreState {
   loginWithEmail: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  clearUser: () => void;
 }
 
 const userStore = create<UserStoreState>()(
@@ -27,6 +32,10 @@ const userStore = create<UserStoreState>()(
         idToken: storage.getString('firebase_id_token') || null,
         isLoading: false,
         error: null,
+        name: '',
+        email: '',
+        uid: '',
+        photoURL: null,
 
         setUser: (user) => set({ user }),
         setIdToken: (token) => {
@@ -76,6 +85,8 @@ const userStore = create<UserStoreState>()(
         },
 
         clearError: () => set({ error: null }),
+
+        clearUser: () => set({ name: '', email: '', uid: '', photoURL: null }),
       }),
       {
         name: "user-store",

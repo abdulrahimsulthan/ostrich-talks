@@ -9,15 +9,23 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ostrich.talks",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "We need access to your microphone for speech recognition during language learning exercises.",
+        "NSSpeechRecognitionUsageDescription": "We use speech recognition to help you practice pronunciation and speaking skills."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.abdulrahimsulthan.ostrichtalks",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.ostrich.talks",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
