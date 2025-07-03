@@ -17,6 +17,7 @@ import lessonRoutes from './routes/lessons';
 import progressRoutes from './routes/progress';
 import leagueRoutes from './routes/leagues';
 import questRoutes from './routes/quests';
+import transcribeRoutes from './routes/transcribe';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -75,6 +76,7 @@ app.use('/api/lessons', authMiddleware, lessonRoutes);
 app.use('/api/progress', authMiddleware, progressRoutes);
 app.use('/api/leagues', authMiddleware, leagueRoutes);
 app.use('/api/quests', authMiddleware, questRoutes);
+app.use('/api/transcribe', transcribeRoutes);
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {

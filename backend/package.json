@@ -13,26 +13,33 @@
     "clean": "rm -rf node_modules dist package-lock.json",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["ostrich-talks", "api", "backend", "express", "mongodb"],
+  "keywords": [
+    "ostrich-talks",
+    "api",
+    "backend",
+    "express",
+    "mongodb"
+  ],
   "author": "Ostrich Talks Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^8.0.3",
+    "@google-cloud/speech": "^7.1.0",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
+    "cloudinary": "^1.41.0",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "dotenv": "^16.3.1",
-    "morgan": "^1.10.0",
-    "compression": "^1.7.4",
-    "multer": "^1.4.5-lts.1",
-    "cloudinary": "^1.41.0",
-    "nodemailer": "^6.9.7",
-    "crypto": "^1.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
+    "mongoose": "^8.0.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -61,4 +68,4 @@
   "engines": {
     "node": ">=18.0.0"
   }
-} 
+}

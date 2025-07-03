@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
-import Voice from '@react-native-voice/voice';
+import { Audio } from 'expo-av';
 import colors from '@/constants/colors';
+import api from '@/lib/api';
 
 interface ExerciseSlideProps {
   text: string;
   onSpeechResult: (result: string) => void;
 }
 
-interface SpeechResultsEvent {
-  value?: string[];
-}
-
 const ExerciseSlide: React.FC<ExerciseSlideProps> = ({ text, onSpeechResult }) => {
-  const [isListening, setIsListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcribedText, setTranscribedText] = useState<string | null>(null);
+  const recordingRef = useRef<Audio.Recording | null>(null);
 
   const speak = () => {
     Speech.speak(text, {
@@ -25,61 +25,105 @@ const ExerciseSlide: React.FC<ExerciseSlideProps> = ({ text, onSpeechResult }) =
     });
   };
 
-  const startListening = async () => {
+  const startRecording = async () => {
     try {
-      await Voice.start('en-US');
-      setIsListening(true);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const stopListening = async () => {
-    try {
-      await Voice.stop();
-      setIsListening(false);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  React.useEffect(() => {
-    Voice.onSpeechResults = (e: SpeechResultsEvent) => {
-      if (e.value && e.value[0]) {
-        onSpeechResult(e.value[0]);
-        stopListening();
+      setTranscribedText(null);
+      setIsRecording(true);
+      // Request permission on Android
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: 'Microphone Permission',
+            message: 'We need access to your microphone to record your speech.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          alert('Permission to access microphone is required!');
+          setIsRecording(false);
+          return;
+        }
       }
-    };
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      await recording.startAsync();
+      recordingRef.current = recording;
+    } catch (e) {
+      setIsRecording(false);
+      console.error(e);
+    }
+  };
 
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
+  const stopRecording = async () => {
+    try {
+      setIsRecording(false);
+      const recording = recordingRef.current;
+      if (!recording) return;
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      if (!uri) return;
+      setIsTranscribing(true);
+      // Send audio to backend for transcription
+      const formData = new FormData();
+      formData.append('audio', {
+        uri,
+        name: 'recording.wav',
+        type: 'audio/wav',
+      } as any);
+      const response = await api.post('/transcribe', formData);
+      const transcript = response.transcript || response.text || '';
+      setTranscribedText(transcript);
+      onSpeechResult(transcript);
+      setIsTranscribing(false);
+      recordingRef.current = null;
+    } catch (e) {
+      setIsTranscribing(false);
+      console.error(e);
+    }
+  };
 
   return (
     <View className="flex-1 bg-background p-6 rounded-lg shadow-md">
       <Text className="text-textPrimary text-xl mb-8">{text}</Text>
-      
       <View className="flex-row justify-around">
         <TouchableOpacity onPress={speak} className="items-center">
           <MaterialIcons name="volume-up" size={32} color={colors.primary} />
           <Text className="text-textSecondary mt-2">Listen</Text>
         </TouchableOpacity>
-
         <TouchableOpacity 
-          onPress={isListening ? stopListening : startListening}
+          onPress={isRecording ? stopRecording : startRecording}
           className="items-center"
+          disabled={isTranscribing}
         >
           <MaterialIcons 
-            name={isListening ? "mic-off" : "mic"} 
+            name={isRecording ? "mic-off" : "mic"} 
             size={32} 
-            color={isListening ? colors.textSecondary : colors.primary} 
+            color={isRecording ? colors.textSecondary : colors.primary} 
           />
           <Text className="text-textSecondary mt-2">
-            {isListening ? 'Stop' : 'Speak'}
+            {isRecording ? 'Stop' : 'Speak'}
           </Text>
         </TouchableOpacity>
       </View>
+      {isTranscribing && (
+        <View className="mt-6 items-center">
+          <ActivityIndicator size="small" color={colors.primary} />
+          <Text className="text-textSecondary mt-2">Transcribing...</Text>
+        </View>
+      )}
+      {transcribedText && (
+        <View className="mt-6 p-4 bg-gray-100 rounded-lg">
+          <Text className="text-textSecondary">Transcription:</Text>
+          <Text className="text-textPrimary mt-2">{transcribedText}</Text>
+        </View>
+      )}
     </View>
   );
 };
